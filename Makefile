@@ -1,14 +1,13 @@
 CC=gcc
 CFLAGS=-fsanitize=address -Wvla -Wall -Werror -g -std=gnu11 -lasan
 
-# add all your make rules
+# fill in all your make rules
 
 vm_x2017: 
 	echo "vm_x2017"
 
 objdump_x2017: 
 	echo "objdump_x2017"
-
 
 tests:
 	echo "tests"
