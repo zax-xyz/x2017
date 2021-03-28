@@ -1,11 +1,21 @@
 CC=gcc
 CFLAGS=-fsanitize=address -Wvla -Wall -Werror -g -std=gnu11 -lasan
 
-timetable: timetable.c
-	$(CC) $(CFLAGS) $^ -o $@
+# add all your make rules
 
-test: timetable
-	bash test.sh
+vm_x2017: 
+	echo "vm_x2017"
+
+objdump_x2017: 
+	echo "objdump_x2017"
+
+
+tests:
+	echo "tests"
+
+run_tests:
+	echo "run_tests"
 
 clean:
-	rm timetable
+	echo "clean"
+
