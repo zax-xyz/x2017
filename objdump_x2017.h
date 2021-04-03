@@ -11,7 +11,7 @@ typedef enum { MOV, CAL, RET, REF, ADD, PRINT, NOT, EQU } OPCODE;
 typedef enum { VAL, REG, STACK, PTR } FIELD_TYPE;
 
 const char* opcodes[] = {
-    "MOV", "CAL", "RET", "REF", "ADD", "ADD", "PRINT","NOT", "EQU"
+    "MOV", "CAL", "RET", "REF", "ADD", "PRINT","NOT", "EQU"
 };
 const char* field_types[] = {"VAL", "REG", "STK", "PTR"};
 
