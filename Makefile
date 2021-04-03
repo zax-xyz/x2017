@@ -1,5 +1,5 @@
 CC=gcc
-CFLAGS=-Wvla -Wall -Werror -std=gnu11
+CFLAGS=-Wvla -Wall -Werror -std=gnu11 -Os
 
 # fill in all your make rules
 

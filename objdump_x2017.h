@@ -13,7 +13,7 @@ typedef enum { VAL, REG, STACK, PTR } FIELD_TYPE;
 const char* opcodes[] = {
     "MOV", "CAL", "RET", "REF", "ADD", "ADD", "PRINT","NOT", "EQU"
 };
-const char* field_types[] = {"VAL", "REG", "STACK", "PTR"};
+const char* field_types[] = {"VAL", "REG", "STK", "PTR"};
 
 typedef struct {
     FIELD_TYPE type;

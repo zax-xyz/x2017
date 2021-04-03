@@ -1,10 +1,7 @@
 #include "objdump_x2017.h"
-#include <stdlib.h>
 
-void errx(int eval, char* fmt) {
-    printf("%s\n", fmt);
-    exit(1);
-}
+#include <err.h>
+#include <stdlib.h>
 
 int main(int argc, char** argv) {
     if (argc != 2)
@@ -26,7 +23,7 @@ int main(int argc, char** argv) {
 
     function_t functions[MAX_FUNCTIONS] = {{ .size = 0 }};
 
-    while (offset >= 1) {
+    while (offset > 1) {
         uint8_t instructions = parse_val(fp, &offset, &buffer, &buffer_len, 5);
         if (!instructions)
             errx(1, "function must have at least 1 instruction (RET).");
@@ -98,7 +95,7 @@ int main(int argc, char** argv) {
             function.instructions[instructions - i] = inst;
         }
 
-        uint8_t function_label = parse_val(fp, &offset, &buffer, &buffer_len, 5);
+        uint8_t function_label = parse_val(fp, &offset, &buffer, &buffer_len, 3);
         functions[function_label] = function;
     }
 
