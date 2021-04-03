@@ -133,7 +133,7 @@ int main(int argc, char** argv) {
 
             argument_t arg = func.instructions[j].second_arg;
             if (opcode == MOV || opcode == REF || opcode == ADD) {
-                if (arg.type == STACK) {
+                if (arg.type == STACK || arg.type == PTR) {
                     printf(" %s %c", field_types[arg.type], arg.value + 'A');
                 } else {
                     printf(" %s %d", field_types[arg.type], arg.value);
