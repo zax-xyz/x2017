@@ -6,8 +6,8 @@ CFLAGS=-fsanitize=address -Wvla -Wall -Werror -g -std=gnu11 -lasan
 vm_x2017: 
 	echo "vm_x2017"
 
-objdump_x2017: 
-	echo "objdump_x2017"
+objdump_x2017: objdump_x2017.c
+	$(CC) $(CFLAGS) $^ -o $@
 
 tests:
 	echo "tests"
