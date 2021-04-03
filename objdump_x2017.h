@@ -4,8 +4,8 @@
 #include <stdint.h>
 #include <stdio.h>
 
-#define MAX_FUNCTIONS 1 << 3 /* 3 bits for function label */
-#define MAX_INSTRUCTIONS 1 << 5 /* 5 bits for number of instructions */
+#define MAX_FUNCTIONS (1 << 3) /* 3 bits for function label */
+#define MAX_INSTRUCTIONS (1 << 5) /* 5 bits for number of instructions */
 
 typedef enum { MOV, CAL, RET, REF, ADD, PRINT, NOT, EQU } OPCODE;
 typedef enum { VAL, REG, STACK, PTR } FIELD_TYPE;

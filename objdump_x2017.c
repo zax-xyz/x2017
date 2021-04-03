@@ -96,10 +96,12 @@ int main(int argc, char** argv) {
             function.instructions[instructions - i] = inst;
         }
 
-        const uint8_t label = parse_val(fp, &offset, &buffer, &buffer_len, 3);
+        function.label = parse_val(fp, &offset, &buffer, &buffer_len, 3);
+
         for (int i = 0; i < function_idx; i++) {
-            if (label == functions[i].label) {
-                errx(1, "function already defined with label %d", label);
+            if (function.label == functions[i].label) {
+                errx(1, "function already defined with label %d",
+                        function.label);
             }
         }
 
@@ -109,7 +111,7 @@ int main(int argc, char** argv) {
     fclose(fp);
 
     for (int i = 0; i < MAX_FUNCTIONS; i++) {
-        function_t func = functions[i];
+        function_t func = functions[MAX_FUNCTIONS - i - 1];
         if (!func.size)
             continue;
 
