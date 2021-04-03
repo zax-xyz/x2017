@@ -32,11 +32,10 @@ typedef struct {
     instruction_t instructions[MAX_INSTRUCTIONS];
 } function_t;
 
+void print_arg(argument_t arg);
 argument_t parse_arg(FILE* fp, uint16_t* buffer, uint8_t* buffer_len,
         long* offset);
 uint8_t parse_val(FILE* fp, long* offset, uint16_t* buffer, uint8_t* buffer_len,
         uint8_t length);
-void extend_buffer(FILE* fp, uint16_t* buffer, uint8_t* buffer_len,
-        long* offset);
 
 #endif
