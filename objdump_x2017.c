@@ -1,7 +1,10 @@
 #include "objdump_x2017.h"
-
-#include <err.h>
 #include <stdlib.h>
+
+void errx(int eval, char* fmt) {
+    printf("%s\n", fmt);
+    exit(1);
+}
 
 int main(int argc, char** argv) {
     if (argc != 2)
