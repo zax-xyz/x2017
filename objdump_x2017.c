@@ -22,6 +22,7 @@ int main(int argc, char** argv) {
     uint8_t buffer_len = 0;
 
     function_t functions[MAX_FUNCTIONS] = {{ .size = 0 }};
+    uint8_t function_idx = 0;
 
     while (offset > 1) {
         uint8_t instructions = parse_val(fp, &offset, &buffer, &buffer_len, 5);
@@ -95,31 +96,40 @@ int main(int argc, char** argv) {
             function.instructions[instructions - i] = inst;
         }
 
-        uint8_t function_label = parse_val(fp, &offset, &buffer, &buffer_len, 3);
-        functions[function_label] = function;
+        const uint8_t label = parse_val(fp, &offset, &buffer, &buffer_len, 3);
+        for (int i = 0; i < function_idx; i++) {
+            if (label == functions[i].label) {
+                errx(1, "function already defined with label %d", label);
+            }
+        }
+
+        functions[function_idx++] = function;
     }
 
     fclose(fp);
 
     for (int i = 0; i < MAX_FUNCTIONS; i++) {
-        if (!functions[i].size) {
+        function_t func = functions[i];
+        if (!func.size)
             continue;
-        }
 
-        printf("FUNC LABEL %d\n", i);
-        for (int j = 0; j < functions[i].size; j++) {
-            uint8_t opcode = functions[i].instructions[j].opcode;
+        printf("FUNC LABEL %d\n", func.label);
+
+        for (int j = 0; j < func.size; j++) {
+            uint8_t opcode = func.instructions[j].opcode;
             printf("    %s", opcodes[opcode]);
+
             if (opcode != RET) {
-                argument_t arg = functions[i].instructions[j].first_arg;
-                if (arg.type == STACK) {
+                argument_t arg = func.instructions[j].first_arg;
+
+                if (arg.type == STACK || arg.type == PTR) {
                     printf(" %s %c", field_types[arg.type], arg.value + 'A');
                 } else {
                     printf(" %s %d", field_types[arg.type], arg.value);
                 }
             }
 
-            argument_t arg = functions[i].instructions[j].second_arg;
+            argument_t arg = func.instructions[j].second_arg;
             if (opcode == MOV || opcode == REF || opcode == ADD) {
                 if (arg.type == STACK) {
                     printf(" %s %c", field_types[arg.type], arg.value + 'A');

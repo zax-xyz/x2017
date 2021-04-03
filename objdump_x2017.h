@@ -27,7 +27,8 @@ typedef struct {
 } instruction_t;
 
 typedef struct {
-    int8_t size;
+    uint8_t label;
+    uint8_t size;
     instruction_t instructions[MAX_INSTRUCTIONS];
 } function_t;
 
