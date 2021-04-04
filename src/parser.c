@@ -94,7 +94,7 @@ function_t* parse(FILE* fp) {
 
         function.label = parse_val(fp, &offset, &buffer, &buffer_len, 3);
 
-        for (int i = 0; i < function_idx; i++) {
+        for (uint8_t i = 0; i < function_idx; i++) {
             if (function.label == x2017_functions[i].label) {
                 errx(1, "multiple function definitions found with label %d",
                         function.label);

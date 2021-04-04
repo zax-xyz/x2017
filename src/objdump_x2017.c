@@ -13,20 +13,25 @@ int main(int argc, char** argv) {
         errx(1, "Error opening file");
 
     function_t* functions = parse(fp);
+    objdump(functions, MAX_FUNCTIONS);
 
+    return 0;
+}
+
+void objdump(function_t* functions, uint8_t size) {
     const char* opcodes[] = {
         "MOV", "CAL", "RET", "REF", "ADD", "PRINT", "NOT", "EQU"
     };
     const char* field_types[] = {"VAL", "REG", "STK", "PTR"};
 
-    for (int i = 0; i < MAX_FUNCTIONS; i++) {
-        function_t func = functions[MAX_FUNCTIONS - i - 1];
+    for (uint8_t i = 0; i < size; i++) {
+        function_t func = functions[size - i - 1];
         if (!func.size)
             continue;
 
         printf("FUNC LABEL %d\n", func.label);
 
-        for (int j = 0; j < func.size; j++) {
+        for (uint8_t j = 0; j < func.size; j++) {
             const OPCODE opcode = func.instructions[j].opcode;
             printf("    %s", opcodes[opcode]);
 
@@ -39,8 +44,6 @@ int main(int argc, char** argv) {
             printf("\n");
         }
     }
-
-    return 0;
 }
 
 void print_arg(argument_t arg, const char** field_types) {
