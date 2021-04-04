@@ -28,7 +28,7 @@ objdump_x2017: $(BUILDDIR)/objdump_x2017.o $(BUILDDIR)/parser.o
 	$(CC) -o $@ $^ -Wl,$(LDFLAGS)
 	$(STRIP) $@
 
-$(BUILDDIR)/%.o: $(SRCDIR)/%.c $(LIBDIR)/%.h
+$(BUILDDIR)/%.o: $(BUILDDIR) $(SRCDIR)/%.c $(LIBDIR)/%.h
 	$(CC) $(CFLAGS) $(LIBS) -c -o $@ $(SRCDIR)/$*.c
 
 tests: $(TESTBIN)
