@@ -15,7 +15,7 @@ int main(int argc, char** argv) {
     function_t* functions = parse(fp);
 
     const char* opcodes[] = {
-        "MOV", "CAL", "RET", "REF", "ADD", "PRINT","NOT", "EQU"
+        "MOV", "CAL", "RET", "REF", "ADD", "PRINT", "NOT", "EQU"
     };
     const char* field_types[] = {"VAL", "REG", "STK", "PTR"};
 
