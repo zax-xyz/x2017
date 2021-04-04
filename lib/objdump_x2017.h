@@ -3,6 +3,6 @@
 
 #include "parser.h"
 
-void print_arg(argument_t arg);
+void print_arg(argument_t arg, const char** field_types);
 
 #endif
