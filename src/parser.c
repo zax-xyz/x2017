@@ -1,17 +1,11 @@
-#include "objdump_x2017.h"
+#include "parser.h"
 
 #include <err.h>
 #include <stdlib.h>
 
-int main(int argc, char** argv) {
-    if (argc != 2)
-        errx(1, "Incorrect number of arguments. Please provide a single binary "
-                "file path.");
+function_t functions[MAX_FUNCTIONS] = {{ .size = 0 }};
 
-    FILE* fp = fopen(argv[1], "rb");
-    if (fp == NULL)
-        errx(1, "Error reading file");
-
+void parse(FILE* fp) {
     fseek(fp, 0, SEEK_END);
     long offset = ftell(fp);
     if (offset < 1)
@@ -20,7 +14,6 @@ int main(int argc, char** argv) {
     uint16_t buffer = 0;
     uint8_t buffer_len = 0;
 
-    function_t functions[MAX_FUNCTIONS] = {{ .size = 0 }};
     uint8_t function_idx = 0;
 
     while (offset > 1) {
@@ -112,37 +105,6 @@ int main(int argc, char** argv) {
     }
 
     fclose(fp);
-
-    for (int i = 0; i < MAX_FUNCTIONS; i++) {
-        function_t func = functions[MAX_FUNCTIONS - i - 1];
-        if (!func.size)
-            continue;
-
-        printf("FUNC LABEL %d\n", func.label);
-
-        for (int j = 0; j < func.size; j++) {
-            const OPCODE opcode = func.instructions[j].opcode;
-            printf("    %s", opcodes[opcode]);
-
-            if (opcode != RET)
-                print_arg(func.instructions[j].first_arg);
-
-            if (opcode == MOV || opcode == REF || opcode == ADD)
-                print_arg(func.instructions[j].second_arg);
-
-            printf("\n");
-        }
-    }
-
-    return 0;
-}
-
-void print_arg(argument_t arg) {
-    if (arg.type == STACK || arg.type == PTR) {
-        printf(" %s %c", field_types[arg.type], arg.value + 'A');
-    } else {
-        printf(" %s %d", field_types[arg.type], arg.value);
-    }
 }
 
 argument_t parse_arg(FILE* fp, uint16_t* buffer, uint8_t* buffer_len,

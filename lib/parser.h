@@ -1,5 +1,5 @@
-#ifndef OBJDUMP_X2017_H
-#define OBJDUMP_X2017_H
+#ifndef PARSER_H
+#define PARSER_H
 
 #include <stdint.h>
 #include <stdio.h>
@@ -9,11 +9,6 @@
 
 typedef enum { MOV, CAL, RET, REF, ADD, PRINT, NOT, EQU } OPCODE;
 typedef enum { VAL, REG, STACK, PTR } FIELD_TYPE;
-
-const char* opcodes[] = {
-    "MOV", "CAL", "RET", "REF", "ADD", "PRINT","NOT", "EQU"
-};
-const char* field_types[] = {"VAL", "REG", "STK", "PTR"};
 
 typedef struct {
     FIELD_TYPE type;
@@ -32,7 +27,9 @@ typedef struct {
     instruction_t instructions[MAX_INSTRUCTIONS];
 } function_t;
 
-void print_arg(argument_t arg);
+extern function_t functions[MAX_FUNCTIONS];
+
+void parse(FILE* fp);
 argument_t parse_arg(FILE* fp, uint16_t* buffer, uint8_t* buffer_len,
         long* offset);
 uint8_t parse_val(FILE* fp, long* offset, uint16_t* buffer, uint8_t* buffer_len,
