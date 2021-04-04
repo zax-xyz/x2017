@@ -27,9 +27,9 @@ typedef struct {
     instruction_t instructions[MAX_INSTRUCTIONS];
 } function_t;
 
-extern function_t functions[MAX_FUNCTIONS];
+extern function_t x2017_functions[MAX_FUNCTIONS];
 
-void parse(FILE* fp);
+function_t* parse(FILE* fp);
 argument_t parse_arg(FILE* fp, uint16_t* buffer, uint8_t* buffer_len,
         long* offset);
 uint8_t parse_val(FILE* fp, long* offset, uint16_t* buffer, uint8_t* buffer_len,

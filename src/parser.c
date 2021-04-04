@@ -3,9 +3,9 @@
 #include <err.h>
 #include <stdlib.h>
 
-function_t functions[MAX_FUNCTIONS] = {{ .size = 0 }};
+function_t x2017_functions[MAX_FUNCTIONS] = {{ .size = 0 }};
 
-void parse(FILE* fp) {
+function_t* parse(FILE* fp) {
     fseek(fp, 0, SEEK_END);
     long offset = ftell(fp);
     if (offset < 1)
@@ -95,16 +95,18 @@ void parse(FILE* fp) {
         function.label = parse_val(fp, &offset, &buffer, &buffer_len, 3);
 
         for (int i = 0; i < function_idx; i++) {
-            if (function.label == functions[i].label) {
+            if (function.label == x2017_functions[i].label) {
                 errx(1, "multiple function definitions found with label %d",
                         function.label);
             }
         }
 
-        functions[function_idx++] = function;
+        x2017_functions[function_idx++] = function;
     }
 
     fclose(fp);
+
+    return x2017_functions;
 }
 
 argument_t parse_arg(FILE* fp, uint16_t* buffer, uint8_t* buffer_len,

@@ -17,7 +17,7 @@ int main(int argc, char** argv) {
     if (fp == NULL)
         errx(1, "Error opening file");
 
-    parse(fp);
+    function_t* functions = parse(fp);
 
     for (int i = 0; i < MAX_FUNCTIONS; i++) {
         function_t func = functions[MAX_FUNCTIONS - i - 1];
