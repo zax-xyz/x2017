@@ -86,8 +86,8 @@ void parse_inst(inst_t* inst, FILE* fp, buf_t* buffer, long* offset) {
         break;
     case REF:
         inst->arg1 = parse_arg(fp, buffer, offset);
-        if (inst->arg1.type == VAL)
-            errx(1, "first argument to REF cannot be value typed.");
+        if (inst->arg1.type != STACK && inst->arg1.type != PTR)
+            errx(1, "first argument to REF must be stack or pointer typed.");
 
         inst->arg2 = parse_arg(fp, buffer, offset);
         if (inst->arg2.type != STACK && inst->arg2.type != PTR)
