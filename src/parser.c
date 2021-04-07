@@ -72,8 +72,8 @@ void parse_inst(inst_t* inst, FILE* fp, buf_t* buffer, long* offset) {
     switch (inst->opcode) {
     case MOV:
         inst->arg1 = parse_arg(fp, buffer, offset);
-        if (inst->arg1.type != REG && inst->arg1.type != STACK)
-            errx(1, "first argument to MOV must be register or stack typed.");
+        if (inst->arg1.type == VAL)
+            errx(1, "first argument to MOV must not be value typed.");
 
         inst->arg2 = parse_arg(fp, buffer, offset);
         break;
