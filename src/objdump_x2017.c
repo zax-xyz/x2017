@@ -8,24 +8,22 @@ int main(int argc, char** argv) {
         errx(1, "Incorrect number of arguments. Please provide a single binary "
                 "file path.");
 
-    FILE* fp = fopen(argv[1], "rb");
-    if (fp == NULL)
-        errx(1, "Error opening file");
+    func_t functions[MAX_FUNCTIONS] = {{ .size = 0 }};
 
-    function_t* functions = parse(fp);
-    objdump(functions, MAX_FUNCTIONS);
+    parse(argv[1], functions);
+    objdump(functions);
 
     return 0;
 }
 
-void objdump(function_t* functions, uint8_t size) {
+void objdump(const func_t* functions) {
     const char* opcodes[] = {
         "MOV", "CAL", "RET", "REF", "ADD", "PRINT", "NOT", "EQU"
     };
     const char* field_types[] = {"VAL", "REG", "STK", "PTR"};
 
-    for (uint8_t i = 0; i < size; i++) {
-        function_t func = functions[size - i - 1];
+    for (uint8_t i = 0; i < MAX_FUNCTIONS; i++) {
+        func_t func = functions[MAX_FUNCTIONS - i - 1];
         if (!func.size)
             continue;
 
@@ -36,19 +34,23 @@ void objdump(function_t* functions, uint8_t size) {
             printf("    %s", opcodes[opcode]);
 
             if (opcode != RET)
-                print_arg(func.instructions[j].first_arg, field_types);
+                print_arg(func.instructions[j].arg1, field_types);
 
             if (opcode == MOV || opcode == REF || opcode == ADD)
-                print_arg(func.instructions[j].second_arg, field_types);
+                print_arg(func.instructions[j].arg2, field_types);
 
             printf("\n");
         }
     }
 }
 
-void print_arg(argument_t arg, const char** field_types) {
+void print_arg(const arg_t arg, const char** field_types) {
     if (arg.type == STACK || arg.type == PTR) {
-        printf(" %s %c", field_types[arg.type], arg.value + 'A');
+        if (arg.value >= 26) {
+            printf(" %s %c", field_types[arg.type], arg.value + 26 + 'a');
+        } else {
+            printf(" %s %c", field_types[arg.type], arg.value + 'A');
+        }
     } else {
         printf(" %s %d", field_types[arg.type], arg.value);
     }

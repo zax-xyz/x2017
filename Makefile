@@ -15,21 +15,23 @@ TESTASM=$(wildcard $(TESTDIR)/*.asm)
 TESTBIN=$(TESTASM:.asm=.x2017)
 
 # fill in all your make rules
-all: $(BUILDDIR) vm_x2017 objdump_x2017
+all: vm_x2017 objdump_x2017
 
 .PHONY: all clean
 
 $(BUILDDIR):
 	mkdir -p $(BUILDDIR)
 
-vm_x2017: 
+vm_x2017: $(BUILDDIR)/vm_x2017.o $(BUILDDIR)/parser.o
+	$(CC) -o $@ $^ -Wl,$(LDFLAGS)
+	$(STRIP) $@
 
 objdump_x2017: $(BUILDDIR)/objdump_x2017.o $(BUILDDIR)/parser.o
 	$(CC) -o $@ $^ -Wl,$(LDFLAGS)
 	$(STRIP) $@
 
-$(BUILDDIR)/%.o: $(BUILDDIR) $(SRCDIR)/%.c $(LIBDIR)/%.h
-	$(CC) $(CFLAGS) $(LIBS) -c -o $@ $(SRCDIR)/$*.c
+$(BUILDDIR)/%.o: $(SRCDIR)/%.c $(LIBDIR)/%.h $(LIBDIR)/parser.h | $(BUILDDIR)
+	$(CC) $(CFLAGS) $(LIBS) -c -o $@ $<
 
 tests: $(TESTBIN)
 

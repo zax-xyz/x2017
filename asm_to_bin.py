@@ -1,48 +1,69 @@
+import random
+from math import ceil
 from sys import stdin, stdout
 
-OPCODES = ['MOV', 'CAL', 'RET', 'REF', 'ADD', 'PRINT', 'NOT', 'EQU']
-ARG_TYPES = ['VAL', 'REG', 'STK', 'PTR']
+MAX_SYMBOLS = 1 << 5
+OPCODES = {k: v for v, k in enumerate(('MOV', 'CAL', 'RET', 'REF', 'ADD',
+                                       'PRINT', 'NOT', 'EQU'))}
+ARGTYPES = {k: v for v, k in enumerate(('VAL', 'REG', 'STK', 'PTR'))}
 
-def b(i, l):
-    return format(i, f'0{l}b')
+stack_symbols = {}
 
-def arg(type, val):
-    if type == "VAL":
-        l = 8
-    elif type == "REG":
-        l = 3
-    else:
-        l = 5
 
-    if type == "STK":
-        val = ord(val) - ord('A')
+def arg(type, val, bits):
+    length = {'VAL': 8, 'REG': 3}.get(type, 5)
+
+    if type in ("STK", "PTR"):
+        try:
+            val = stack_symbols[val]
+        except KeyError:
+            tmp = random.choice(
+                [i for i in range(MAX_SYMBOLS) if i not in stack_symbols.values()]
+            )
+            stack_symbols[val] = tmp
+            val = tmp
     else:
         val = int(val)
 
-    return b(val, l) + b(ARG_TYPES.index(type), 2)
+    return (((bits << length) + val) << 2) + ARGTYPES[type], length + 2
 
-s = ''
+
+bits = 0
+length = 0
+ops = 0
+is_first = True
 
 for line in stdin:
     line = line.split()
     op = line[0]
+
     if op == "FUNC":
+        if not is_first:
+            bits = (bits << 5) + ops
+            length += 5
+        else:
+            is_first = False
+
         label = int(line[-1])
-        s += b(label, 3)
+        bits = (bits << 3) + label
+        length += 3
         ops = 0
     else:
         ops += 1
-        if op in ["MOV", "REF", "ADD"]:
-            s += arg(line[3], line[4])
+
+        if op in ("MOV", "REF", "ADD"):
+            bits, l = arg(line[3], line[4], bits)
+            length += l
         if op != "RET":
-            s += arg(line[1], line[2])
+            bits, l = arg(line[1], line[2], bits)
+            length += l
 
-        s += b(OPCODES.index(op), 3)
+        bits = (bits << 3) + OPCODES[op]
+        length += 3
 
-        if op == "RET":
-            s += b(ops, 5)
+bits = (bits << 5) + ops
+length += 5
 
-if len(s) % 8:
-    s = '0' * (8 - (len(s) % 8)) + s
+length = ceil(length / 8)
 
-stdout.buffer.write(int(s, 2).to_bytes(len(s) // 8, 'big'))
+stdout.buffer.write(bits.to_bytes(length, 'big'))

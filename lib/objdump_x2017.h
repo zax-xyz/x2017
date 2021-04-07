@@ -3,7 +3,7 @@
 
 #include "parser.h"
 
-void objdump(function_t* functions, uint8_t size);
-void print_arg(argument_t arg, const char** field_types);
+void objdump(const func_t* functions);
+void print_arg(const arg_t arg, const char** field_types);
 
 #endif
