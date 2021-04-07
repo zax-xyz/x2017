@@ -103,9 +103,6 @@ void parse_inst(inst_t* inst, FILE* fp, buf_t* buffer, long* offset) {
         break;
     case PRINT:
         inst->arg1 = parse_arg(fp, buffer, offset);
-        if (inst->arg1.type == VAL)
-            errx(1, "first argument to ADD must not be value typed.");
-
         break;
     case NOT:
         inst->arg1 = parse_arg(fp, buffer, offset);

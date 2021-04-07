@@ -1,4 +1,5 @@
 FUNC LABEL 0
     MOV STK A VAL 5
     PRINT STK A
+    PRINT VAL 5
     RET
