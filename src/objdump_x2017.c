@@ -42,8 +42,6 @@ void objdump(const func_t* functions) {
             printf("\n");
         }
     }
-
-    printf("asdfkh\n");
 }
 
 void print_arg(const arg_t arg, const char** field_types) {
