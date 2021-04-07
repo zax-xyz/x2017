@@ -49,6 +49,6 @@ arg_t parse_arg(FILE* fp, buf_t* buffer, long* offset);
 uint8_t parse_val(FILE* fp, long* offset, buf_t* buffer, const uint8_t length);
 
 void map_stack(inst_t* inst, uint8_t* stack_symbols, uint8_t* stack_idx);
-void map_symbol(uint8_t* val, uint8_t* stack_symbols, uint8_t* stack_idx);
+void map_symbol(arg_t* arg, uint8_t* stack_symbols, uint8_t* stack_idx);
 
 #endif

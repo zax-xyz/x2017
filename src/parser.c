@@ -34,7 +34,7 @@ void parse(const char* filename, func_t* functions) {
         // stack frame large for every function to accommodate every potential
         // value. instead we optimise the stack frames to their minimum size.
         uint8_t stack_symbols[MAX_INSTRUCTIONS];
-        for (int i = 0; i < MAX_INSTRUCTIONS; i++) {
+        for (uint8_t i = 0; i < MAX_INSTRUCTIONS; i++) {
             // UINT8_MAX is greater than the highest stack symbol value
             stack_symbols[i] = UINT8_MAX;
         }
@@ -43,10 +43,13 @@ void parse(const char* filename, func_t* functions) {
         uint8_t stack_idx = 0;
 
         for (uint8_t i = 2; i <= instructions; i++) {
-            inst_t* inst = function.instructions + instructions - i;
+            inst_t* inst = &function.instructions[instructions - i];
             inst->opcode = parse_val(fp, &offset, &buffer, OPCODE_SIZE);
             parse_inst(inst, fp, &buffer, &offset);
-            map_stack(inst, stack_symbols, &stack_idx);
+        }
+
+        for (uint8_t i = 0; i < instructions - 1; i++) {
+            map_stack(&function.instructions[i], stack_symbols, &stack_idx);
         }
 
         function.frame_size = stack_idx;
@@ -167,21 +170,12 @@ uint8_t parse_val(FILE* fp, long* offset, buf_t* buffer, const uint8_t length) {
 void map_stack(inst_t* inst, uint8_t* stack_symbols, uint8_t* stack_idx) {
     switch (inst->opcode) {
     case MOV:
-        if (inst->arg1.type == STACK)
-            map_symbol(&inst->arg1.value, stack_symbols, stack_idx);
-
-        if (inst->arg2.type == STACK)
-            map_symbol(&inst->arg2.value, stack_symbols, stack_idx);
-
+    case REF:
+        map_symbol(&inst->arg1, stack_symbols, stack_idx);
+        map_symbol(&inst->arg2, stack_symbols, stack_idx);
         break;
     case PRINT:
-        if (inst->arg1.type == STACK)
-            map_symbol(&inst->arg1.value, stack_symbols, stack_idx);
-
-        break;
-    case REF:
-        map_symbol(&inst->arg1.value, stack_symbols, stack_idx);
-        map_symbol(&inst->arg2.value, stack_symbols, stack_idx);
+        map_symbol(&inst->arg1, stack_symbols, stack_idx);
         break;
     default:
         // none of the other operations use stack symbols
@@ -189,12 +183,15 @@ void map_stack(inst_t* inst, uint8_t* stack_symbols, uint8_t* stack_idx) {
     }
 }
 
-void map_symbol(uint8_t* val, uint8_t* stack_symbols, uint8_t* stack_idx) {
-    if (stack_symbols[*val] != UINT8_MAX) {
-        *val = stack_symbols[*val];
+void map_symbol(arg_t* arg, uint8_t* stack_symbols, uint8_t* stack_idx) {
+    if (arg->type != STACK && arg->type != PTR)
+        return;
+
+    if (stack_symbols[arg->value] != UINT8_MAX) {
+        arg->value = stack_symbols[arg->value];
         return;
     }
 
-    stack_symbols[*val] = *stack_idx;
-    *val = *stack_idx++;
+    stack_symbols[arg->value] = *stack_idx;
+    arg->value = (*stack_idx)++;
 }
