@@ -105,7 +105,7 @@ uint8_t run_instruction(const inst_t inst, uint8_t* ram, uint8_t* registers) {
 	// store the address of stack symbol B into A
 	registers[4] = STACK_LOC(inst.arg1.value);
 	registers[5] = STACK_LOC(inst.arg2.value);
-	ram[registers[4]] = ram[registers[5]];
+	ram[registers[4]] = registers[5];
 	break;
     case ADD:
 	// add registers A and B, storing into A
