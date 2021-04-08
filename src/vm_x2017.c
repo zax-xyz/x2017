@@ -116,21 +116,21 @@ uint8_t run_instruction(const inst_t inst, uint8_t* ram, uint8_t* registers) {
 
 void mov(const arg_t arg, uint8_t* ram, uint8_t* registers) {
     switch (arg.type) {
-	case REG:
-	    registers[arg.value] = registers[4];
-	    break;
-	case STACK:
-	    registers[5] = STACK_LOC(arg.value);
-	    ram[registers[5]] = registers[4];
-	    break;
-	case PTR:
-	    registers[5] = STACK_LOC(arg.value);
-	    registers[5] = ram[registers[5]];
-	    ram[registers[5]] = registers[4];
-	    break;
-	case VAL:
-	    // our parser already ensures it can't be VAL
-	    break;
+    case REG:
+	registers[arg.value] = registers[4];
+	break;
+    case STACK:
+	registers[5] = STACK_LOC(arg.value);
+	ram[registers[5]] = registers[4];
+	break;
+    case PTR:
+	registers[5] = STACK_LOC(arg.value);
+	registers[5] = ram[registers[5]];
+	ram[registers[5]] = registers[4];
+	break;
+    case VAL:
+	// our parser already ensures it can't be VAL
+	break;
     }
 }
 
