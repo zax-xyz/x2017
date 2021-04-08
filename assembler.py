@@ -15,6 +15,9 @@ def arg(type, val, bits):
     length = {'VAL': 8, 'REG': 3}.get(type, 5)
 
     if type in ('STK', 'PTR'):
+        # use a random unique value for each stack symbol
+        # objdump should print based on order of appearance regardless of the
+        # specific values
         try:
             val = stack_symbols[val]
         except KeyError:

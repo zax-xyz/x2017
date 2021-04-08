@@ -71,50 +71,18 @@ void parse(const char* filename, func_t* functions) {
 void parse_inst(inst_t* inst, FILE* fp, buf_t* buffer, long* offset) {
     switch (inst->opcode) {
     case MOV:
+    case REF:
+    case ADD:
         inst->arg1 = parse_arg(fp, buffer, offset);
-        if (inst->arg1.type == VAL)
-            errx(1, "first argument to MOV must not be value typed.");
-
         inst->arg2 = parse_arg(fp, buffer, offset);
         break;
     case CAL:
-        inst->arg1 = parse_arg(fp, buffer, offset);
-        if (inst->arg1.type != VAL)
-            errx(1, "first argument to CAL must be value typed.");
-        break;
-    case RET:
-        break;
-    case REF:
-        inst->arg1 = parse_arg(fp, buffer, offset);
-        inst->arg2 = parse_arg(fp, buffer, offset);
-        if (inst->arg2.type != STACK)
-            errx(1, "second argument to REF must be typed.");
-
-        break;
-    case ADD:
-        inst->arg1 = parse_arg(fp, buffer, offset);
-        if (inst->arg1.type != REG)
-            errx(1, "first argument to ADD must be register typed.");
-
-        inst->arg2 = parse_arg(fp, buffer, offset);
-        if (inst->arg2.type != REG)
-            errx(1, "second argument to ADD must be register typed.");
-
-        break;
     case PRINT:
-        inst->arg1 = parse_arg(fp, buffer, offset);
-        break;
     case NOT:
-        inst->arg1 = parse_arg(fp, buffer, offset);
-        if (inst->arg1.type != REG)
-            errx(1, "first argument to NOT must be register typed.");
-
-        break;
     case EQU:
         inst->arg1 = parse_arg(fp, buffer, offset);
-        if (inst->arg1.type != REG)
-            errx(1, "first argument to EQU must be register typed.");
-
+        break;
+    case RET:
         break;
     }
 }

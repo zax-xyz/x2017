@@ -69,15 +69,22 @@ uint8_t run_instruction(const inst_t inst, uint8_t* ram, uint8_t* registers) {
     switch (inst.opcode) {
     case MOV:
 	// copy value from B to A
+        if (inst.arg1.type == VAL)
+            errx(1, "first argument to MOV must not be value typed.");
+
 	registers[4] = arg_value(inst.arg2, ram, registers);
 	mov(inst.arg1, ram, registers);
 
 	break;
     case CAL:
 	// call another function
+        if (inst.arg1.type != VAL)
+            errx(1, "first argument to CAL must be value typed.");
+
 	call_function(inst.arg1.value, ram, registers);
 	break;
     case RET:
+	// return
 	registers[4] = STACK_START + ram[MAX_FUNCTIONS];
 	if (registers[6] == registers[4])
 	    return 1;
@@ -88,12 +95,18 @@ uint8_t run_instruction(const inst_t inst, uint8_t* ram, uint8_t* registers) {
 	registers[7] = ram[registers[5]];
 	break;
     case REF:
+        if (inst.arg2.type != STACK)
+            errx(1, "second argument to REF must be typed.");
+
 	// store the address of stack symbol B into A
 	registers[4] = STACK_LOC(inst.arg2.value);
 	mov(inst.arg1, ram, registers);
 	break;
     case ADD:
 	// add registers A and B, storing into A
+        if (inst.arg1.type != REG || inst.arg2.type != REG)
+            errx(1, "both arguments to ADD must be register typed.");
+
 	registers[inst.arg1.value] += registers[inst.arg2.value];
 	break;
     case PRINT:
@@ -102,11 +115,17 @@ uint8_t run_instruction(const inst_t inst, uint8_t* ram, uint8_t* registers) {
 	printf("%u\n", registers[4]);
 	break;
     case NOT:
-	// inplace bitwise not on register
+	// inplace bitwise NOT on register
+        if (inst.arg1.type != REG)
+            errx(1, "first argument to NOT must be register typed.");
+
 	registers[inst.arg1.value] = ~registers[inst.arg1.value];
 	break;
     case EQU:
 	// tests if a register is equal to 0
+        if (inst.arg1.type != REG)
+            errx(1, "first argument to EQU must be register typed.");
+
 	registers[inst.arg1.value] = registers[inst.arg1.value] == 0;
 	break;
     }
