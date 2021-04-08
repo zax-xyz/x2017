@@ -35,18 +35,20 @@ void vm_x2017(func_t* functions) {
     uint8_t instr_idx = 0;
 
     for (uint8_t i = 0; i < MAX_FUNCTIONS; i++) {
-	if (!functions[i].size)
+        func_t func = functions[MAX_FUNCTIONS - i - 1];
+
+	if (!func.size)
 	    continue;
 
 	// use first part of ram for the function instruction addresses
-	ram[i] = instr_idx;
+	ram[func.label] = instr_idx;
 
-	for (uint8_t j = 0; j < functions[i].size; j++, instr_idx++) {
-	    instructions[instr_idx] = functions[i].instructions[j];
+	for (uint8_t j = 0; j < func.size; j++, instr_idx++) {
+	    instructions[instr_idx] = func.instructions[j];
 	}
 
 	// next chunck of ram is used for the stack frame sizes
-	ram[MAX_FUNCTIONS + i] = functions[i].frame_size;
+	ram[MAX_FUNCTIONS + func.label] = func.frame_size;
     }
 
     if (ram[0] == UINT8_MAX)
@@ -68,23 +70,7 @@ uint8_t run_instruction(const inst_t inst, uint8_t* ram, uint8_t* registers) {
     case MOV:
 	// copy value from B to A
 	registers[4] = arg_value(inst.arg2, ram, registers);
-	switch (inst.arg1.type) {
-	    case REG:
-		registers[inst.arg1.value] = registers[4];
-		break;
-	    case STACK:
-		registers[5] = STACK_LOC(inst.arg1.value);
-		ram[registers[5]] = registers[4];
-		break;
-	    case PTR:
-		registers[5] = STACK_LOC(inst.arg1.value);
-		registers[5] = ram[registers[5]];
-		ram[registers[5]] = registers[4];
-		break;
-	    case VAL:
-		// our parser already ensures it can't be VAL
-		break;
-	}
+	mov(inst.arg1, ram, registers);
 
 	break;
     case CAL:
@@ -95,17 +81,16 @@ uint8_t run_instruction(const inst_t inst, uint8_t* ram, uint8_t* registers) {
 	registers[4] = STACK_START + ram[MAX_FUNCTIONS];
 	if (registers[6] == registers[4])
 	    return 1;
-	// TODO
-	registers[5] = registers[4] + 1;
-	registers[6] = registers[5];
+
+	registers[5] = registers[6] + 1;
+	registers[6] = ram[registers[5]];
 	registers[5]++;
-	registers[7] = registers[5];
+	registers[7] = ram[registers[5]];
 	break;
     case REF:
 	// store the address of stack symbol B into A
-	registers[4] = STACK_LOC(inst.arg1.value);
-	registers[5] = STACK_LOC(inst.arg2.value);
-	ram[registers[4]] = registers[5];
+	registers[4] = STACK_LOC(inst.arg2.value);
+	mov(inst.arg1, ram, registers);
 	break;
     case ADD:
 	// add registers A and B, storing into A
@@ -127,6 +112,26 @@ uint8_t run_instruction(const inst_t inst, uint8_t* ram, uint8_t* registers) {
     }
 
     return 0;
+}
+
+void mov(const arg_t arg, uint8_t* ram, uint8_t* registers) {
+    switch (arg.type) {
+	case REG:
+	    registers[arg.value] = registers[4];
+	    break;
+	case STACK:
+	    registers[5] = STACK_LOC(arg.value);
+	    ram[registers[5]] = registers[4];
+	    break;
+	case PTR:
+	    registers[5] = STACK_LOC(arg.value);
+	    registers[5] = ram[registers[5]];
+	    ram[registers[5]] = registers[4];
+	    break;
+	case VAL:
+	    // our parser already ensures it can't be VAL
+	    break;
+    }
 }
 
 uint8_t arg_value(const arg_t arg, const uint8_t* ram, uint8_t* registers) {
@@ -155,7 +160,7 @@ void call_function(uint8_t label, uint8_t* ram, uint8_t* registers) {
 		label);
 
     // new frame pointer
-    registers[4] = registers[6] + ram[MAX_FUNCTIONS + label];
+    registers[4] = registers[6] + 2 + ram[MAX_FUNCTIONS + label];
 
     // store previous frame pointer
     registers[5] = registers[4] + 1;
