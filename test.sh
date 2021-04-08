@@ -19,7 +19,7 @@ for t in tests/*.asm; do
 	echo -n Testing $base... 
 	out=$(diff --color=always <(./objdump_x2017 $base.x2017) $t) 
 
-	if [ $? ]; then
+	if [ $? = 0 ]; then
 		let passed++
 		echo -e $GREEN PASSED$NC
 	else
@@ -44,7 +44,7 @@ for t in tests/*.out; do
 	echo -n Testing $base... 
 	out=$(diff --color=always <(./vm_x2017 $base.x2017) $t) 
 
-	if [ $? ]; then
+	if [ $? = 0 ]; then
 		let passed++
 		echo -e $GREEN PASSED$NC
 	else
