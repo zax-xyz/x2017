@@ -7,7 +7,7 @@ ORANGE='\033[0;33m'
 BLUE='\033[0;34m'
 NC='\033[0m'
 
-echo -e $BLUE--- TESTING ---$NC
+echo -e $BLUE--- TESTING objdump_x2017 ---$NC
 
 passed=0
 total=0
@@ -18,12 +18,33 @@ for t in tests/*.asm; do
 
 	echo -n Testing $base... 
 	out=$(diff --color=always <(./objdump_x2017 $base.x2017) $t) 
-	objdump_passed=$?
 
-	out=$(diff --color=always <(./vm_x2017 $base.x2017) $base.out) 
-	vm_passed=$?
+	if [ $? ]; then
+		let passed++
+		echo -e $GREEN PASSED$NC
+	else
+		echo -e $RED FAILED$NC
+		echo "$out"
+	fi
+done;
 
-	if [ $objdump_passed = 0 ] && [ $vm_passed = 0 ]; then
+echo -e Passed $ORANGE$passed/$total$NC tests
+
+echo
+
+echo -e $BLUE--- TESTING vm_x2017 ---$NC
+
+passed=0
+total=0
+
+for t in tests/*.out; do
+	let total++
+	base=${t%.out}
+
+	echo -n Testing $base... 
+	out=$(diff --color=always <(./vm_x2017 $base.x2017) $t) 
+
+	if [ $? ]; then
 		let passed++
 		echo -e $GREEN PASSED$NC
 	else

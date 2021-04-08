@@ -36,7 +36,7 @@ $(BUILDDIR)/%.o: $(SRCDIR)/%.c $(LIBDIR)/%.h $(LIBDIR)/parser.h | $(BUILDDIR)
 tests: $(TESTBIN)
 
 $(TESTDIR)/%.x2017: $(TESTDIR)/%.asm
-	python asm_to_bin.py < $^ > $@
+	./assembler.py $^ $@
 
 run_tests:
 	./test.sh
