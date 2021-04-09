@@ -2,9 +2,16 @@
 
 #include <err.h>
 
+#define FRAME_PTR (registers[6])
+#define PROG_CTR (registers[7])
+
+// use first chunk of ram for function addresses and frame sizes
+#define INSTR_ADDR(FUNC_LABEL) (ram[FUNC_LABEL])
+#define FRAME_SIZE(FUNC_LABEL) (ram[MAX_FUNCTIONS + FUNC_LABEL])
+
 #define STACK_START (MAX_FUNCTIONS * 2)
 #define STACK_MAX UINT8_MAX
-#define STACK_LOC(X) (registers[6] - (X))
+#define STACK_LOC(X) (FRAME_PTR - (X))
 
 int main(int argc, char** argv) {
     if (argc != 2)
@@ -40,27 +47,25 @@ void vm_x2017(func_t* functions) {
 	if (!func.size)
 	    continue;
 
-	// use first part of ram for the function instruction addresses
-	ram[func.label] = instr_idx;
+	INSTR_ADDR(func.label) = instr_idx;
 
 	for (uint8_t j = 0; j < func.size; j++, instr_idx++) {
 	    instructions[instr_idx] = func.instructions[j];
 	}
 
-	// next chunck of ram is used for the stack frame sizes
-	ram[MAX_FUNCTIONS + func.label] = func.frame_size;
+	FRAME_SIZE(func.label) = func.frame_size;
     }
 
     if (ram[0] == UINT8_MAX)
 	errx(1, "No main function found");
 
-    registers[7] = ram[0];
+    PROG_CTR = ram[0];
 
     // frame pointer
     // we'll have our stack frames backwards to make it easier to add them
     registers[6] = STACK_START + ram[MAX_FUNCTIONS];
 
-    while (!run_instruction(instructions[registers[7]++], ram, registers)) {}
+    while (!run_instruction(instructions[PROG_CTR++], ram, registers)) {}
 
     return;
 }
@@ -86,13 +91,13 @@ uint8_t run_instruction(const inst_t inst, uint8_t* ram, uint8_t* registers) {
     case RET:
 	// return
 	registers[4] = STACK_START + ram[MAX_FUNCTIONS];
-	if (registers[6] == registers[4])
+	if (FRAME_PTR == registers[4])
 	    return 1;
 
-	registers[5] = registers[6] + 1;
-	registers[6] = ram[registers[5]];
+	registers[5] = FRAME_PTR + 1;
+	FRAME_PTR = ram[registers[5]];
 	registers[5]++;
-	registers[7] = ram[registers[5]];
+	PROG_CTR = ram[registers[5]];
 	break;
     case REF:
         if (inst.arg2.type != STACK)
@@ -174,22 +179,22 @@ uint8_t arg_value(const arg_t arg, const uint8_t* ram, uint8_t* registers) {
 
 void call_function(uint8_t label, uint8_t* ram, uint8_t* registers) {
     registers[4] = STACK_MAX - ram[MAX_FUNCTIONS + label] - 2;
-    if (registers[6] >= registers[4])
+    if (FRAME_PTR >= registers[4])
 	errx(1, "Stack overflow detected when trying to call function %d",
 		label);
 
     // new frame pointer
-    registers[4] = registers[6] + 2 + ram[MAX_FUNCTIONS + label];
+    registers[4] = FRAME_PTR + 2 + ram[MAX_FUNCTIONS + label];
 
     // store previous frame pointer
     registers[5] = registers[4] + 1;
-    ram[registers[5]] = registers[6];
+    ram[registers[5]] = FRAME_PTR;
 
     // store previous program counter
     registers[5]++;
-    ram[registers[5]] = registers[7];
+    ram[registers[5]] = PROG_CTR;
 
     // update frame pointer and program counter
-    registers[6] = registers[4];
-    registers[7] = ram[label];
+    FRAME_PTR = registers[4];
+    PROG_CTR = ram[label];
 }
