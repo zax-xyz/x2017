@@ -96,7 +96,7 @@ uint8_t run_instruction(const inst_t inst, uint8_t* ram, uint8_t* registers) {
 	break;
     case REF:
         if (inst.arg2.type != STACK)
-            errx(1, "second argument to REF must be typed.");
+            errx(1, "second argument to REF must be stack typed.");
 
 	// store the address of stack symbol B into A
 	registers[4] = STACK_LOC(inst.arg2.value);
@@ -174,7 +174,7 @@ uint8_t arg_value(const arg_t arg, const uint8_t* ram, uint8_t* registers) {
 
 void call_function(uint8_t label, uint8_t* ram, uint8_t* registers) {
     registers[4] = STACK_MAX - ram[MAX_FUNCTIONS + label] - 2;
-    if (registers[6] > registers[4])
+    if (registers[6] >= registers[4])
 	errx(1, "Stack overflow detected when trying to call function %d",
 		label);
 
