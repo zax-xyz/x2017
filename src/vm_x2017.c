@@ -181,6 +181,8 @@ uint8_t arg_value(const arg_t arg, const uint8_t* ram, uint8_t* registers) {
 }
 
 void call_function(uint8_t label, uint8_t* ram, uint8_t* registers) {
+    // we need to offset by 2 for the "actual" edge of this stack frame,
+    // then offset by 2 again for the extra information for the next stack frame
     registers[4] = STACK_MAX - ram[MAX_FUNCTIONS + label] - 4;
     if (STACK_PTR > registers[4])
 	errx(1, "Stack overflow detected when trying to call function %d",
