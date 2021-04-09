@@ -1,16 +1,16 @@
 #include "objdump_x2017.h"
 
 #include <err.h>
-#include <stdlib.h>
 
+// _start function specific to x86-64 linux
 asm(
     ".global _start\n\t"
     "_start:"
-    "    movq   (%rsp), %rdi\n\t"
-    "    leaq   8(%rsp), %rsi\n\t"
+    "    movq   (%rsp), %rdi\n\t" // argc is in rsp (register stack pointer)
+    "    leaq   8(%rsp), %rsi\n\t" // argv pointer
     "    call   main\n\t"
 
-    "    movl   %eax, %edi\n\t"
+    "    movl   %eax, %edi\n\t" // pass main's return value to exit
     "    call   exit\n\t"
 );
 
@@ -24,7 +24,7 @@ int main(int argc, char** argv) {
     parse(argv[1], functions);
     objdump(functions);
 
-    exit(0);
+    return 1;
 }
 
 void objdump(const func_t* functions) {
