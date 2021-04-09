@@ -1,6 +1,7 @@
 #include "vm_x2017.h"
 
 #include <err.h>
+#include <stdlib.h>
 
 #define MAIN_FUNC 0
 
@@ -17,16 +18,16 @@
 
 asm(
     ".global _start\n\t"
-    "_start:\n\t"
-    "   xorl %ebp,%ebp\n\t"                     // Clear the frame pointer. As ABI suggests
-    "   movq 0(%rsp),%rdi\n\t"                  // argc
-    "   lea 8(%rsp),%rsi\n\t"                   // argv = %rsp + 8
-    "   call __main\n\t"                        // call main function
-    "   movq %rax,%rdi\n\t"                     // main return code as an argument for exit syscall
-    "   movl $60,%eax\n\t"                      // 60 = exit
-    "   syscall\n\t");
+    "_start:"
+    "    movq   (%rsp), %rdi\n\t"
+    "    leaq   8(%rsp), %rsi\n\t"
+    "    call   main\n\t"
 
-int __main(int argc, char** argv) {
+    "    movl   %eax, %edi\n\t"
+    "    call   exit\n\t"
+);
+
+int main(int argc, char** argv) {
     if (argc != 2)
         errx(1, "Incorrect number of arguments. Please provide a single binary "
                 "file path.");
@@ -36,7 +37,7 @@ int __main(int argc, char** argv) {
     parse(argv[1], functions);
     vm_x2017(functions);
 
-    return 0;
+    exit(0);
 }
 
 void vm_x2017(func_t* functions) {
