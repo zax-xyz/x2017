@@ -47,7 +47,7 @@ void objdump(const func_t* functions) {
 void print_arg(const arg_t arg, const char** field_types) {
     if (arg.type == STACK || arg.type == PTR) {
         if (arg.value >= 26) {
-            printf(" %s %c", field_types[arg.type], arg.value + 26 + 'a');
+            printf(" %s %c", field_types[arg.type], arg.value - 26 + 'a');
         } else {
             printf(" %s %c", field_types[arg.type], arg.value + 'A');
         }
