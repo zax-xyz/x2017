@@ -27,7 +27,7 @@ void objdump(const func_t* functions) {
         if (!func.size)
             continue;
 
-        printf("FUNC LABEL %d\n", func.label);
+        printf("FUNC LABL %d\n", func.label);
 
         for (uint8_t j = 0; j < func.size; j++) {
             const OPCODE opcode = func.instructions[j].opcode;
