@@ -2,7 +2,9 @@
 
 #include <err.h>
 
-#define FRAME_PTR (registers[6])
+#define MAIN_FUNC 0
+
+#define STACK_PTR (registers[6])
 #define PROG_CTR (registers[7])
 
 // use first chunk of ram for function addresses and frame sizes
@@ -11,7 +13,7 @@
 
 #define STACK_START (MAX_FUNCTIONS * 2)
 #define STACK_MAX UINT8_MAX
-#define STACK_LOC(X) (FRAME_PTR - (X))
+#define STACK_LOC(X) (STACK_PTR - (X))
 
 int main(int argc, char** argv) {
     if (argc != 2)
@@ -56,14 +58,14 @@ void vm_x2017(func_t* functions) {
 	FRAME_SIZE(func.label) = func.frame_size;
     }
 
-    if (ram[0] == UINT8_MAX)
+    PROG_CTR = INSTR_ADDR(MAIN_FUNC);
+
+    if (PROG_CTR == UINT8_MAX)
 	errx(1, "No main function found");
 
-    PROG_CTR = ram[0];
-
-    // frame pointer
     // we'll have our stack frames backwards to make it easier to add them
-    registers[6] = STACK_START + ram[MAX_FUNCTIONS];
+    STACK_PTR = STACK_START + FRAME_SIZE(MAIN_FUNC);
+    ram[STACK_PTR + 1] = 0; // 0 frame pointer to indicate this is entry point
 
     while (!run_instruction(instructions[PROG_CTR++], ram, registers)) {}
 
@@ -90,14 +92,15 @@ uint8_t run_instruction(const inst_t inst, uint8_t* ram, uint8_t* registers) {
 	break;
     case RET:
 	// return
-	registers[4] = STACK_START + ram[MAX_FUNCTIONS];
-	if (FRAME_PTR == registers[4])
+	registers[4] = STACK_PTR + 1; // frame ptr position
+	if (ram[registers[4]] == 0)
+	    // exit if returning from main function
 	    return 1;
 
-	registers[5] = FRAME_PTR + 1;
-	FRAME_PTR = ram[registers[5]];
-	registers[5]++;
-	PROG_CTR = ram[registers[5]];
+	STACK_PTR = ram[registers[4]];
+
+	registers[4]++; // previous program counter
+	PROG_CTR = ram[registers[4]];
 	break;
     case REF:
         if (inst.arg2.type != STACK)
@@ -179,22 +182,23 @@ uint8_t arg_value(const arg_t arg, const uint8_t* ram, uint8_t* registers) {
 
 void call_function(uint8_t label, uint8_t* ram, uint8_t* registers) {
     registers[4] = STACK_MAX - ram[MAX_FUNCTIONS + label] - 2;
-    if (FRAME_PTR >= registers[4])
+    if (STACK_PTR >= registers[4])
 	errx(1, "Stack overflow detected when trying to call function %d",
 		label);
 
-    // new frame pointer
-    registers[4] = FRAME_PTR + 2 + ram[MAX_FUNCTIONS + label];
+    // new stack pointer
+    // note that after each frame we reserve 2 bytes for return information
+    registers[4] = STACK_PTR + 2 + FRAME_SIZE(label);
 
-    // store previous frame pointer
+    // frame pointer
     registers[5] = registers[4] + 1;
-    ram[registers[5]] = FRAME_PTR;
+    ram[registers[5]] = STACK_PTR;
 
     // store previous program counter
     registers[5]++;
     ram[registers[5]] = PROG_CTR;
 
-    // update frame pointer and program counter
-    FRAME_PTR = registers[4];
-    PROG_CTR = ram[label];
+    // update stack pointer and program counter
+    STACK_PTR = registers[4];
+    PROG_CTR = INSTR_ADDR(label);
 }
