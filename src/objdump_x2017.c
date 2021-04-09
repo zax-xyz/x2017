@@ -24,7 +24,7 @@ int main(int argc, char** argv) {
     parse(argv[1], functions);
     objdump(functions);
 
-    return 1;
+    return 0;
 }
 
 void objdump(const func_t* functions) {
