@@ -23,11 +23,11 @@ $(BUILDDIR):
 	mkdir -p $(BUILDDIR)
 
 vm_x2017: $(BUILDDIR)/vm_x2017.o $(BUILDDIR)/parser.o
-	$(CC) -o $@ $^ $(LDFLAGS)
+	$(CC) -o objdump_x2017 $^ $(LDFLAGS)
 	$(STRIP) $@
 
 objdump_x2017: $(BUILDDIR)/objdump_x2017.o $(BUILDDIR)/parser.o
-	$(CC) -o $@ $^ $(LDFLAGS)
+	$(CC) -o objdump_x2017 $^ $(LDFLAGS)
 	$(STRIP) $@
 
 $(BUILDDIR)/%.o: $(SRCDIR)/%.c $(LIBDIR)/%.h $(LIBDIR)/parser.h | $(BUILDDIR)
