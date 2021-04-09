@@ -3,7 +3,18 @@
 #include <err.h>
 #include <stdlib.h>
 
-int main(int argc, char** argv) {
+asm(
+    ".global _start\n\t"
+    "_start:\n\t"
+    "   xorl %ebp,%ebp\n\t"                     // Clear the frame pointer. As ABI suggests
+    "   movq 0(%rsp),%rdi\n\t"                  // argc
+    "   lea 8(%rsp),%rsi\n\t"                   // argv = %rsp + 8
+    "   call __main\n\t"                        // call main function
+    "   movq %rax,%rdi\n\t"                     // main return code as an argument for exit syscall
+    "   movl $60,%eax\n\t"                      // 60 = exit
+    "   syscall\n\t");
+
+int __main(int argc, char** argv) {
     if (argc != 2)
         errx(1, "Incorrect number of arguments. Please provide a single binary "
                 "file path.");

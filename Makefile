@@ -1,6 +1,6 @@
 CC=gcc
-CFLAGS=-Wvla -Wall -Werror -std=gnu11 -Os -s -ffunction-sections -fdata-sections -flto -fno-asynchronous-unwind-tables -fno-stack-protector
-LDFLAGS=-Wl,--gc-sections,-flto,-z,norelro,--hash-style=sysv,--build-id=none
+CFLAGS=-Wvla -Wall -Werror -std=gnu11 -Os -s -ffunction-sections -fdata-sections -fno-asynchronous-unwind-tables -fno-stack-protector -nostartfiles
+LDFLAGS=-Wl,--gc-sections,-z,norelro,--hash-style=sysv,--build-id=none -nostartfiles
 
 STRIP=strip -S --strip-unneeded -R .comment -R .note -R .note.ABI-tag -R .eh_frame -R .eh_frame_hdr -R .note.gnu.property -R .gnu.version -R .hash -R .data
 
