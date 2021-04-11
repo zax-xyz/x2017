@@ -104,11 +104,14 @@ uint8_t run_instruction(const inst_t inst, uint8_t* ram, uint8_t* registers) {
 	PROG_CTR = ram[registers[4]];
 	break;
     case REF:
-        if (inst.arg2.type != STACK)
-            errx(1, "second argument to REF must be stack typed.");
+        if (inst.arg2.type != STACK && inst.arg2.type != PTR)
+            errx(1, "second argument to REF must be stack or pointer typed.");
 
 	// store the address of stack symbol B into A
 	registers[4] = STACK_LOC(inst.arg2.value);
+	if (inst.arg2.type == PTR)
+	    registers[4] = ram[registers[4]];
+
 	mov(inst.arg1, ram, registers);
 	break;
     case ADD:
