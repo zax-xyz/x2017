@@ -1,18 +1,7 @@
 #include "objdump_x2017.h"
+#include "start.h"
 
 #include <err.h>
-
-// _start function specific to x86-64 linux
-asm(
-    ".global _start\n\t"
-    "_start:"
-    "    movq   (%rsp), %rdi\n\t" // argc is in rsp (register stack pointer)
-    "    leaq   8(%rsp), %rsi\n\t" // argv pointer
-    "    call   main\n\t"
-
-    "    movl   %eax, %edi\n\t" // pass main's return value to exit
-    "    call   exit\n\t"
-);
 
 int main(int argc, char** argv) {
     if (argc != 2)
@@ -38,7 +27,7 @@ void objdump(const func_t* functions) {
         if (!func.size)
             continue;
 
-        printf("FUNC LABEL %d\n", func.label);
+        printf("FUNC LABL %d\n", func.label);
 
         for (uint8_t j = 0; j < func.size; j++) {
             const OPCODE opcode = func.instructions[j].opcode;

@@ -1,4 +1,5 @@
 #include "vm_x2017.h"
+#include "start.h"
 
 #include <err.h>
 
@@ -14,18 +15,6 @@
 #define STACK_START (MAX_FUNCTIONS * 2)
 #define STACK_MAX UINT8_MAX
 #define STACK_LOC(X) (STACK_PTR - (X))
-
-// _start function specific to x86-64 linux
-asm(
-    ".global _start\n\t"
-    "_start:"
-    "    movq   (%rsp), %rdi\n\t" // argc is in rsp (register stack pointer)
-    "    leaq   8(%rsp), %rsi\n\t" // argv pointer
-    "    call   main\n\t"
-
-    "    movl   %eax, %edi\n\t" // pass main's return value to exit
-    "    call   exit\n\t"
-);
 
 int main(int argc, char** argv) {
     if (argc != 2)
