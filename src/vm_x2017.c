@@ -52,7 +52,7 @@ void vm_x2017(func_t* functions) {
 
 	INSTR_ADDR(func.label) = instr_idx;
 	if (!func.size || func.instructions[func.size - 1].opcode != RET)
-	    errx(1, "No return instruction fount at end of function %d",
+	    errx(1, "No return instruction found at end of function %d",
 		    func.label);
 
 	for (uint8_t j = 0; j < func.size; j++, instr_idx++) {
