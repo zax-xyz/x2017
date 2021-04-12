@@ -34,8 +34,8 @@ void vm_x2017(func_t* functions) {
 
     // initialise function addresses. we have a default value in order to check
     // if a main function is present. note that this default value is impossible
-    // to be a function entry point as it can only be used for the last
-    // instruction, with every function having maximum number of instructions
+    // to be a function entry point as it can only be the last instruction, with
+    // every function having maximum number of instructions
     for (int i = 0; i < MAX_FUNCTIONS; i++)
 	ram[i] = MAX_INSTRUCTIONS;
 
@@ -51,6 +51,9 @@ void vm_x2017(func_t* functions) {
 	    continue;
 
 	INSTR_ADDR(func.label) = instr_idx;
+	if (!func.size || func.instructions[func.size - 1].opcode != RET)
+	    errx(1, "No return instruction fount at end of function %d",
+		    func.label);
 
 	for (uint8_t j = 0; j < func.size; j++, instr_idx++) {
 	    instructions[instr_idx] = func.instructions[j];

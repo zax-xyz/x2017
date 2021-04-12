@@ -18,16 +18,7 @@ void parse(const char* filename, func_t* functions) {
 
     while (offset > 1) {
         uint8_t instructions = parse_val(fp, &offset, &buffer, INSTR_SIZE);
-        if (!instructions)
-            errx(1, "function must have at least 1 instruction (RET).");
-
         func_t function = { .size = instructions };
-
-        const uint8_t opcode = parse_val(fp, &offset, &buffer, OPCODE_SIZE);
-        if (opcode != RET)
-            errx(1, "no RET instruction found at end of function.");
-
-        function.instructions[instructions - 1].opcode = RET;
 
         // used to map stack symbols to offsets within the stack frames.
         // we could use the compiled value but this would require making the
@@ -42,7 +33,7 @@ void parse(const char* filename, func_t* functions) {
         // cursor for current highest offset value
         uint8_t stack_idx = 0;
 
-        for (uint8_t i = 2; i <= instructions; i++) {
+        for (uint8_t i = 1; i <= instructions; i++) {
             inst_t* inst = &function.instructions[instructions - i];
             inst->opcode = parse_val(fp, &offset, &buffer, OPCODE_SIZE);
             parse_inst(inst, fp, &buffer, &offset);
