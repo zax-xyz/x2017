@@ -3,9 +3,6 @@
 
 #include "parser.h"
 
-#define RAM_SIZE (1 << 8)
-#define NUM_REGISTERS 8
-
 void vm_x2017(func_t* functions);
 
 uint8_t run_instruction(const inst_t inst, uint8_t* ram, uint8_t* registers);

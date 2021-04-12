@@ -5,6 +5,9 @@
 
 #define MAIN_FUNC 0
 
+#define RAM_SIZE (1 << 8)
+#define NUM_REGISTERS 8
+
 #define STACK_PTR (registers[6])
 #define PROG_CTR (registers[7])
 
