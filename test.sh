@@ -54,3 +54,32 @@ for t in tests/*.out; do
 done;
 
 echo -e Passed $ORANGE$passed/$total$NC tests
+
+echo
+
+echo -e $BLUE--- TESTING vm_x2017 ERROR CASES ---$NC
+
+passed=0
+total=0
+
+for t in tests/*.err; do
+	let total++
+	base=${t%.err}
+
+	echo -n Testing $base... 
+
+	out=$(./vm_x2017 $base.x2017 2>&1 > /dev/null)
+	code=$?
+
+	out=$(diff --color=always <(echo "$out") $t) 
+
+	if [ $? = 0 ] && [ $code = 1 ]; then
+		let passed++
+		echo -e $GREEN PASSED$NC
+	else
+		echo -e $RED FAILED$NC
+		echo "$out"
+	fi
+done;
+
+echo -e Passed $ORANGE$passed/$total$NC tests

@@ -127,14 +127,17 @@ void map_stack(inst_t* inst, uint8_t* stack_symbols, uint8_t* stack_idx) {
     switch (inst->opcode) {
     case MOV:
     case REF:
+    case ADD:
         map_symbol(&inst->arg1, stack_symbols, stack_idx);
         map_symbol(&inst->arg2, stack_symbols, stack_idx);
         break;
+    case CAL:
     case PRINT:
+    case NOT:
+    case EQU:
         map_symbol(&inst->arg1, stack_symbols, stack_idx);
         break;
-    default:
-        // none of the other operations use stack symbols
+    case RET:
         break;
     }
 }

@@ -1,7 +1,4 @@
 #include "objdump_x2017.h"
-#include "start.h"
-
-#include <err.h>
 
 int main(int argc, char** argv) {
     if (argc != 2)

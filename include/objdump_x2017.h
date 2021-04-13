@@ -2,6 +2,9 @@
 #define OBJDUMP_X2017_H
 
 #include "parser.h"
+#include "start.h"
+
+#include <err.h>
 
 void objdump(const func_t* functions);
 void print_arg(const arg_t arg, const char** field_types);

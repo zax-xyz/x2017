@@ -1,23 +1,4 @@
 #include "vm_x2017.h"
-#include "start.h"
-
-#include <err.h>
-
-#define MAIN_FUNC 0
-
-#define RAM_SIZE (1 << 8)
-#define NUM_REGISTERS 8
-
-#define STACK_PTR (registers[6])
-#define PROG_CTR (registers[7])
-
-// use first chunk of ram for function addresses and frame sizes
-#define INSTR_ADDR(FUNC_LABEL) (ram[FUNC_LABEL])
-#define FRAME_SIZE(FUNC_LABEL) (ram[MAX_FUNCTIONS + FUNC_LABEL])
-
-#define STACK_START (MAX_FUNCTIONS * 2)
-#define STACK_MAX UINT8_MAX
-#define STACK_LOC(X) (STACK_PTR - (X))
 
 int main(int argc, char** argv) {
     if (argc != 2)

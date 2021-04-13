@@ -5,7 +5,7 @@ LDFLAGS=-Wl,--gc-sections,-z,norelro,--hash-style=sysv,--build-id=none -nostartf
 STRIP=strip -S --strip-unneeded -R .comment -R .note -R .note.ABI-tag -R .eh_frame -R .eh_frame_hdr -R .note.gnu.property -R .gnu.version -R .hash -R .data
 
 SRCDIR=src
-LIBDIR=lib
+LIBDIR=include
 BUILDDIR=build
 
 LIBS=-I$(LIBDIR)
