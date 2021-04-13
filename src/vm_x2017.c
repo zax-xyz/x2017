@@ -185,6 +185,7 @@ uint8_t arg_value(const arg_t arg, const uint8_t* ram, uint8_t* registers) {
     case PTR:
 	registers[4] = STACK_LOC(arg.value);
 	registers[5] = ram[registers[4]];
+	// we now have the address and can dereference this pointer
 	return ram[registers[5]];
     default:
 	// unreached
