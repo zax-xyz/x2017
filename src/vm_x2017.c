@@ -155,6 +155,7 @@ void mov(const arg_t arg, uint8_t* ram, uint8_t* registers) {
     case PTR:
 	registers[5] = STACK_LOC(arg.value);
 	registers[5] = ram[registers[5]];
+	// we now have the address and can dereference this pointer
 	ram[registers[5]] = registers[4];
 	break;
     case VAL:
