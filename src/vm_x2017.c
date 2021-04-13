@@ -45,9 +45,8 @@ void vm_x2017(func_t* functions) {
 	    errx(1, "No return instruction found at end of function %d",
 		    func.label);
 
-	for (uint8_t j = 0; j < func.size; j++, instr_idx++) {
+	for (uint8_t j = 0; j < func.size; j++, instr_idx++)
 	    instructions[instr_idx] = func.instructions[j];
-	}
 
 	FRAME_SIZE(func.label) = func.frame_size;
     }
