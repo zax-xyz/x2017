@@ -1,8 +1,8 @@
 /*
  * _start function specific to AMD64 (x86-64) linux ABI
  *
- * %rsp usually stores the return address for the function, but since _start
- * isn't actually a function, it doesn't get put there, and instead argc ends up
+ * %rsp usually stores the return address for the function, but since this isn't
+ * actually a function, it doesn't get put there, and instead argc ends up
  * taking its place since it's the first thing that gets put on the stack,
  * followed by argv
  */
