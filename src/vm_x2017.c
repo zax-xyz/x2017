@@ -1,5 +1,8 @@
 #include "vm_x2017.h"
 
+/*
+ * The entry point
+ */
 int main(int argc, char** argv) {
     if (argc != 2)
         errx(1, "Incorrect number of arguments. Please provide a single binary "
@@ -13,6 +16,9 @@ int main(int argc, char** argv) {
     return 0;
 }
 
+/*
+ * The bulk of the program. Executes the x2017 program.
+ */
 void vm_x2017(func_t* functions) {
     uint8_t ram[RAM_SIZE];
 
@@ -60,6 +66,9 @@ void vm_x2017(func_t* functions) {
     return;
 }
 
+/*
+ * Executes a single vm instruction
+ */
 uint8_t run_instruction(const inst_t inst, uint8_t* ram, uint8_t* registers) {
     switch (inst.opcode) {
     case MOV:
@@ -132,6 +141,9 @@ uint8_t run_instruction(const inst_t inst, uint8_t* ram, uint8_t* registers) {
     return 0;
 }
 
+/*
+ * Helper to copy a value from one place to another in the vm
+ */
 void mov(const arg_t arg, uint8_t* ram, uint8_t* registers) {
     switch (arg.type) {
     case REG:
@@ -152,6 +164,15 @@ void mov(const arg_t arg, uint8_t* ram, uint8_t* registers) {
     }
 }
 
+/*
+ * Gets the value from an argument
+ *
+ * For a VAL argument type, simply returns the raw value. For a REG argument,
+ * returns the value stored in the corresponding register. For a STACK argument,
+ * returns the value stored in the stack for that stack symbol. For a PTR
+ * argument, treats it as a stack symbol, reads that symbol's value, then using
+ * that value as a memory address, returns the value stored at that address.
+ */
 uint8_t arg_value(const arg_t arg, const uint8_t* ram, uint8_t* registers) {
     switch (arg.type) {
     case VAL:
@@ -167,10 +188,14 @@ uint8_t arg_value(const arg_t arg, const uint8_t* ram, uint8_t* registers) {
 	return ram[registers[5]];
     default:
 	// unreached
+	// needed to stop gcc from complaining about end of non-void function
 	return 0;
     }
 }
 
+/*
+ * Calls an x2017 function by its label
+ */
 void call_function(uint8_t label, uint8_t* ram, uint8_t* registers) {
     // we need to offset by 2 for the "actual" edge of this stack frame,
     // then offset by 2 again for the extra information for the next stack frame
@@ -183,7 +208,7 @@ void call_function(uint8_t label, uint8_t* ram, uint8_t* registers) {
     // note that after each frame we reserve 2 bytes for return information
     registers[4] = STACK_PTR + 2 + FRAME_SIZE(label);
 
-    // frame pointer
+    // store frame pointer
     registers[5] = registers[4] + 1;
     ram[registers[5]] = STACK_PTR;
 

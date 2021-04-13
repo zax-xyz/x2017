@@ -2,6 +2,10 @@
 
 #include <err.h>
 
+/*
+ * Parses an x2017 binary given its filename, and stores information about its
+ * program code into an array of functions
+ */
 void parse(const char* filename, func_t* functions) {
     FILE* fp = fopen(filename, "rb");
     if (fp == NULL)
@@ -59,6 +63,10 @@ void parse(const char* filename, func_t* functions) {
     fclose(fp);
 }
 
+/*
+ * Parses an instruction from an x2017 binary file and stores its relevant
+ * instruction.
+ */
 void parse_inst(inst_t* inst, FILE* fp, buf_t* buffer, long* offset) {
     switch (inst->opcode) {
     case MOV:
@@ -78,6 +86,10 @@ void parse_inst(inst_t* inst, FILE* fp, buf_t* buffer, long* offset) {
     }
 }
 
+/*
+ * Parses an instruction argument from an x2017 binary file and returns its
+ * information.
+ */
 arg_t parse_arg(FILE* fp, buf_t* buffer, long* offset) {
     arg_t arg;
 
@@ -101,6 +113,10 @@ arg_t parse_arg(FILE* fp, buf_t* buffer, long* offset) {
     return arg;
 }
 
+/*
+ * Reads a value from an x2017 binary file given a number of bits and returns
+ * it.
+ */
 uint8_t parse_val(FILE* fp, long* offset, buf_t* buffer, const uint8_t length) {
     if (buffer->size < length) {
         // extend buffer
@@ -123,6 +139,10 @@ uint8_t parse_val(FILE* fp, long* offset, buf_t* buffer, const uint8_t length) {
     return value;
 }
 
+/*
+ * Maps stack symbols within a function to offsets within the frame. Starts from
+ * 0 and increases the offset for each unique stack symbol encountered.
+ */
 void map_stack(inst_t* inst, uint8_t* stack_symbols, uint8_t* stack_idx) {
     switch (inst->opcode) {
     case MOV:
@@ -142,6 +162,11 @@ void map_stack(inst_t* inst, uint8_t* stack_symbols, uint8_t* stack_idx) {
     }
 }
 
+/*
+ * Maps a specific stack symbol to an offset within the stack frame. If the
+ * symbol has been encountered before, re-uses the same value, else increases
+ * the index for a unique offset.
+ */
 void map_symbol(arg_t* arg, uint8_t* stack_symbols, uint8_t* stack_idx) {
     if (arg->type != STACK && arg->type != PTR)
         return;
