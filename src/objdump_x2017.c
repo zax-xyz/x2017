@@ -1,5 +1,8 @@
 #include "objdump_x2017.h"
 
+/*
+ * The entry point
+ */
 int main(int argc, char** argv) {
     if (argc != 2)
         errx(1, "Incorrect number of arguments. Please provide a single binary "
@@ -13,6 +16,10 @@ int main(int argc, char** argv) {
     return 0;
 }
 
+/*
+ * The bulk of the program. Outputs the x2017 assembly instructions in a human-
+ * readable format
+ */
 void objdump(const func_t* functions) {
     const char* opcodes[] = {
         "MOV", "CAL", "RET", "REF", "ADD", "PRINT", "NOT", "EQU"
@@ -41,6 +48,9 @@ void objdump(const func_t* functions) {
     }
 }
 
+/*
+ * Prints a single argument from an x2017 instruction in a human-readable format
+ */
 void print_arg(const arg_t arg, const char** field_types) {
     if (arg.type == STACK || arg.type == PTR) {
         if (arg.value >= 26) {
