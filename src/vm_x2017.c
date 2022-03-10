@@ -27,7 +27,7 @@ void vm_x2017(func_t* functions) {
     // to be a function entry point as it can only be the last instruction, with
     // every function having maximum number of instructions
     for (int i = 0; i < MAX_FUNCTIONS; i++)
-	ram[i] = MAX_INSTRUCTIONS;
+        ram[i] = MAX_INSTRUCTIONS;
 
     uint8_t registers[NUM_REGISTERS];
 
@@ -37,24 +37,24 @@ void vm_x2017(func_t* functions) {
     for (uint8_t i = 0; i < MAX_FUNCTIONS; i++) {
         func_t func = functions[MAX_FUNCTIONS - i - 1];
 
-	if (!func.size)
-	    continue;
+        if (!func.size)
+            continue;
 
-	INSTR_ADDR(func.label) = instr_idx;
-	if (!func.size || func.instructions[func.size - 1].opcode != RET)
-	    errx(1, "No return instruction found at end of function %d",
-		    func.label);
+        INSTR_ADDR(func.label) = instr_idx;
+        if (!func.size || func.instructions[func.size - 1].opcode != RET)
+            errx(1, "No return instruction found at end of function %d",
+                    func.label);
 
-	for (uint8_t j = 0; j < func.size; j++, instr_idx++)
-	    instructions[instr_idx] = func.instructions[j];
+        for (uint8_t j = 0; j < func.size; j++, instr_idx++)
+            instructions[instr_idx] = func.instructions[j];
 
-	FRAME_SIZE(func.label) = func.frame_size;
+        FRAME_SIZE(func.label) = func.frame_size;
     }
 
     PROG_CTR = INSTR_ADDR(MAIN_FUNC);
 
     if (PROG_CTR == UINT8_MAX)
-	errx(1, "No main function found");
+        errx(1, "No main function found");
 
     // we'll have our stack frames backwards to make it easier to add them
     STACK_PTR = STACK_START + FRAME_SIZE(MAIN_FUNC);
@@ -71,70 +71,70 @@ void vm_x2017(func_t* functions) {
 uint8_t run_instruction(const inst_t inst, uint8_t* ram, uint8_t* registers) {
     switch (inst.opcode) {
     case MOV:
-	// copy value from B to A
+        // copy value from B to A
         if (inst.arg1.type == VAL)
             errx(1, "first argument to MOV must not be value typed.");
 
-	registers[4] = arg_value(inst.arg2, ram, registers);
-	mov(inst.arg1, ram, registers);
+        registers[4] = arg_value(inst.arg2, ram, registers);
+        mov(inst.arg1, ram, registers);
 
-	break;
+        break;
     case CAL:
-	// call another function
+        // call another function
         if (inst.arg1.type != VAL)
             errx(1, "first argument to CAL must be value typed.");
 
-	call_function(inst.arg1.value, ram, registers);
-	break;
+        call_function(inst.arg1.value, ram, registers);
+        break;
     case RET:
-	// return
-	registers[4] = STACK_PTR + 1; // frame ptr position
-	if (ram[registers[4]] == 0)
-	    // exit if returning from main function
-	    return 1;
+        // return
+        registers[4] = STACK_PTR + 1; // frame ptr position
+        if (ram[registers[4]] == 0)
+            // exit if returning from main function
+            return 1;
 
-	STACK_PTR = ram[registers[4]];
+        STACK_PTR = ram[registers[4]];
 
-	registers[4]++; // previous program counter
-	PROG_CTR = ram[registers[4]];
-	break;
+        registers[4]++; // previous program counter
+        PROG_CTR = ram[registers[4]];
+        break;
     case REF:
         if (inst.arg2.type != STACK && inst.arg2.type != PTR)
             errx(1, "second argument to REF must be stack or pointer typed.");
 
-	// store the address of stack symbol B into A
-	registers[4] = STACK_LOC(inst.arg2.value);
-	if (inst.arg2.type == PTR)
-	    registers[4] = ram[registers[4]];
+        // store the address of stack symbol B into A
+        registers[4] = STACK_LOC(inst.arg2.value);
+        if (inst.arg2.type == PTR)
+            registers[4] = ram[registers[4]];
 
-	mov(inst.arg1, ram, registers);
-	break;
+        mov(inst.arg1, ram, registers);
+        break;
     case ADD:
-	// add registers A and B, storing into A
+        // add registers A and B, storing into A
         if (inst.arg1.type != REG || inst.arg2.type != REG)
             errx(1, "both arguments to ADD must be register typed.");
 
-	registers[inst.arg1.value] += registers[inst.arg2.value];
-	break;
+        registers[inst.arg1.value] += registers[inst.arg2.value];
+        break;
     case PRINT:
-	// print value at address as uint
-	registers[4] = arg_value(inst.arg1, ram, registers);
-	printf("%u\n", registers[4]);
-	break;
+        // print value at address as uint
+        registers[4] = arg_value(inst.arg1, ram, registers);
+        printf("%u\n", registers[4]);
+        break;
     case NOT:
-	// inplace bitwise NOT on register
+        // inplace bitwise NOT on register
         if (inst.arg1.type != REG)
             errx(1, "first argument to NOT must be register typed.");
 
-	registers[inst.arg1.value] = ~registers[inst.arg1.value];
-	break;
+        registers[inst.arg1.value] = ~registers[inst.arg1.value];
+        break;
     case EQU:
-	// tests if a register is equal to 0
+        // tests if a register is equal to 0
         if (inst.arg1.type != REG)
             errx(1, "first argument to EQU must be register typed.");
 
-	registers[inst.arg1.value] = registers[inst.arg1.value] == 0;
-	break;
+        registers[inst.arg1.value] = registers[inst.arg1.value] == 0;
+        break;
     }
 
     return 0;
@@ -146,21 +146,21 @@ uint8_t run_instruction(const inst_t inst, uint8_t* ram, uint8_t* registers) {
 void mov(const arg_t arg, uint8_t* ram, uint8_t* registers) {
     switch (arg.type) {
     case REG:
-	registers[arg.value] = registers[4];
-	break;
+        registers[arg.value] = registers[4];
+        break;
     case STACK:
-	registers[5] = STACK_LOC(arg.value);
-	ram[registers[5]] = registers[4];
-	break;
+        registers[5] = STACK_LOC(arg.value);
+        ram[registers[5]] = registers[4];
+        break;
     case PTR:
-	registers[5] = STACK_LOC(arg.value);
-	registers[5] = ram[registers[5]];
-	// we now have the address and can dereference this pointer
-	ram[registers[5]] = registers[4];
-	break;
+        registers[5] = STACK_LOC(arg.value);
+        registers[5] = ram[registers[5]];
+        // we now have the address and can dereference this pointer
+        ram[registers[5]] = registers[4];
+        break;
     case VAL:
-	// our parser already ensures it can't be VAL
-	break;
+        // our parser already ensures it can't be VAL
+        break;
     }
 }
 
@@ -176,21 +176,21 @@ void mov(const arg_t arg, uint8_t* ram, uint8_t* registers) {
 uint8_t arg_value(const arg_t arg, const uint8_t* ram, uint8_t* registers) {
     switch (arg.type) {
     case VAL:
-	return arg.value;
+        return arg.value;
     case REG:
-	return registers[arg.value];
+        return registers[arg.value];
     case STACK:
-	registers[4] = STACK_LOC(arg.value);
-	return ram[registers[4]];
+        registers[4] = STACK_LOC(arg.value);
+        return ram[registers[4]];
     case PTR:
-	registers[4] = STACK_LOC(arg.value);
-	registers[5] = ram[registers[4]];
-	// we now have the address and can dereference this pointer
-	return ram[registers[5]];
+        registers[4] = STACK_LOC(arg.value);
+        registers[5] = ram[registers[4]];
+        // we now have the address and can dereference this pointer
+        return ram[registers[5]];
     default:
-	// unreached
-	// needed to stop gcc from complaining about end of non-void function
-	return 0;
+        // unreached
+        // needed to stop gcc from complaining about end of non-void function
+        return 0;
     }
 }
 
@@ -202,8 +202,8 @@ void call_function(uint8_t label, uint8_t* ram, uint8_t* registers) {
     // then offset by 2 again for the extra information for the next stack frame
     registers[4] = STACK_MAX - ram[MAX_FUNCTIONS + label] - 4;
     if (STACK_PTR > registers[4])
-	errx(1, "Stack overflow detected when trying to call function %d",
-		label);
+        errx(1, "Stack overflow detected when trying to call function %d",
+                label);
 
     // new stack pointer
     // note that after each frame we reserve 2 bytes for return information
